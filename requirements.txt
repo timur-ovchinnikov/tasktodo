@@ -2,3 +2,5 @@ fastapi[all]
 uvicorn
 psycopg[binary]   # Драйвер для PostgreSQL
 redis
+alembic
+psycopg2

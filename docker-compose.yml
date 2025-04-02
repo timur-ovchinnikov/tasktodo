@@ -30,6 +30,7 @@ services:
     environment:
       DATABASE_URL: postgresql://todo_user:todo_password@db/todo_db
       REDIS_URL: redis://todo_redis:6379/0
+      PYTHONPATH: /app
     ports:
       - "8000:8000"
     volumes:
