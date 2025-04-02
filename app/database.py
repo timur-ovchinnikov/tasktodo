@@ -7,7 +7,8 @@ from sqlalchemy.orm import Session
 DATABASE_URL = "postgresql://todo_user:todo_password@db/todo_db"
 
 # Создание двигателя (engine) для подключения к базе данных
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+# Убираем параметр connect_args, так как он не нужен для PostgreSQL
+engine = create_engine(DATABASE_URL)
 
 # Базовый класс для моделей
 Base = declarative_base()

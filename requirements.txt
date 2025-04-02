@@ -1,6 +1,9 @@
-fastapi[all]
-uvicorn
-psycopg[binary]   # Драйвер для PostgreSQL
-redis
-alembic
+fastapi[all]  # Включает fastapi, pydantic, uvicorn и другие зависимости
+psycopg[binary]  # Драйвер для PostgreSQL
+redis  # Для возможного кэширования
+alembic  # Миграции базы данных
+bcrypt  # Библиотека для хеширования паролей (в принципе, можно убрать, так как используем passlib[argon2])
+passlib[argon2]  # Хеширование паролей с Argon2
+pyjwt  # Для работы с JWT-токенами
+python-dotenv  # Чтение конфигурации из .env
 psycopg2
