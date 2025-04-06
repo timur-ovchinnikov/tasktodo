@@ -1,24 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from app import models, schemas, crud, auth
 from app.database import get_db
-from app.models import User
-from app.auth import hash_password
-from pydantic import BaseModel, EmailStr
+from passlib.context import CryptContext
 
 router = APIRouter()
 
-class RegisterRequest(BaseModel):
-    email: EmailStr
-    password: str
+@router.post("/login")
+def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if not db_user or not auth.verify_password(user.password, db_user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
-@router.post("/register")
-def register_user(request: RegisterRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == request.email).first()
-    if user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    new_user = User(email=request.email, hashed_password=hash_password(request.password))
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return {"message": "User created successfully"}
+    # Создание токена
+    access_token = auth.create_access_token(data={"sub": db_user.email})
+    return {"access_token": access_token, "token_type": "bearer"}

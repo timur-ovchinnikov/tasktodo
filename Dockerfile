@@ -1,5 +1,9 @@
 FROM python:3.11
 
+# Устанавливаем postgresql-client
+RUN apt-get update && \
+    apt-get install -y postgresql-client
+
 WORKDIR /app
 
 COPY requirements.txt .
