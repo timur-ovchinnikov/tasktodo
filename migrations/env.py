@@ -1,7 +1,6 @@
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-
 from app.database import Base
 from app import models  # Важно: чтобы Alembic видел все таблицы
 
@@ -10,7 +9,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = Base.metadata
+target_metadata = models.Base.metadata
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode."""
