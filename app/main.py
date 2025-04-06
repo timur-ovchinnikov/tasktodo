@@ -1,7 +1,5 @@
 import sys
 import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "app")))  # Убедитесь, что путь к app правильный
 from fastapi import FastAPI, HTTPException
 from app.models import User
 from app.schemas import UserCreate
