@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app import models, schemas
 from uuid import UUID
 from app.security import get_password_hash, verify_password
+from pydantic import BaseModel
 
 # Создание нового пользователя
 def create_user(db: Session, user: schemas.UserCreate):
@@ -60,3 +61,18 @@ def delete_task(db: Session, task_id: UUID, user_id: UUID):
     db.delete(task)
     db.commit()
     return {"msg": "Task successfully deleted"}
+
+class UserCreate(BaseModel):
+    # ...existing fields...
+    class Config:
+        from_attributes = True  # Updated from orm_mode
+
+class TaskCreate(BaseModel):
+    # ...existing fields...
+    class Config:
+        from_attributes = True  # Updated from orm_mode
+
+class TaskUpdate(BaseModel):
+    # ...existing fields...
+    class Config:
+        from_attributes = True  # Updated from orm_mode

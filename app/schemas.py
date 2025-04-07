@@ -40,6 +40,14 @@ class UserCreate(BaseModel):
     class Config:
         orm_mode = True
 
+# Схема для пользователя (используется в зависимостях)
+class User(BaseModel):
+    id: UUID
+    email: str
+
+    class Config:
+        orm_mode = True
+
 # Схема для токена
 class Token(BaseModel):
     access_token: str
@@ -57,6 +65,14 @@ class TaskUpdate(BaseModel):
     description: str | None = None
     due_date: datetime | None = None
     completed: bool | None = None
+
+    class Config:
+        orm_mode = True
+
+# Схема для входа пользователя
+class UserLogin(BaseModel):
+    email: str
+    password: str
 
     class Config:
         orm_mode = True

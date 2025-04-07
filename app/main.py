@@ -1,25 +1,17 @@
-import sys
-import os
 from fastapi import FastAPI, HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app import schemas
-from app.models import User, Task
-from app.schemas import UserCreate, TaskCreate, UserOut, TaskOut
-from app.database import SessionLocal
-from app import crud, jwt
+from app import schemas, crud, jwt
 from app.security import verify_password
-from app.schemas import TaskUpdate
+from app.schemas import UserCreate, TaskCreate, UserOut, TaskOut, TaskUpdate
+from app.database import get_db
+from app.routers import task, auth
+from app.schemas import User  # Добавляем импорт User
 
 app = FastAPI()
 
-# Создаем сессию базы данных
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+app.include_router(task.router, prefix="/api/v1/tasks", tags=["tasks"])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 
 @app.get("/")
 def read_root():
