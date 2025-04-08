@@ -67,6 +67,16 @@ docker exec -it todo_app alembic upgrade head
 
 Это создаст необходимые таблицы в базе данных.
 
+## Debugging Internal Server Errors
+
+1. Check the FastAPI server logs for detailed error messages.
+2. Verify the database connection and ensure migrations are applied:
+   ```bash
+   docker exec -it todo_app alembic upgrade head
+   ```
+3. Ensure the request payload matches the expected schema in `TaskCreate`.
+4. Inspect the `create_task` function in `crud.py` for potential issues.
+
 ## Использование API через curl
 
 ### Регистрация пользователя
@@ -88,7 +98,7 @@ curl -X POST http://localhost:8000/token \
 curl -X POST http://localhost:8000/api/v1/tasks/ \
 -H "Authorization: Bearer <ACCESS_TOKEN>" \
 -H "Content-Type: application/json" \
--d '{"title": "New Task", "description": "Task description", "due_date": "2023-12-31T23:59:59"}'
+-d '{"title": "New Task", "description": "Task description", "due_date": "2025-12-31T23:59:59"}'
 ```
 
 ### Получение списка задач

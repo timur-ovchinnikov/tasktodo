@@ -12,8 +12,16 @@ class TaskCreate(BaseModel):
     class Config:
         orm_mode = True
 
-class TaskResponse(TaskCreate):
-    id: str
+class TaskResponse(BaseModel):
+    id: str  # Убедитесь, что это str
+    title: str
+    description: str | None
+    due_date: datetime
+    completed: bool
+    executor_id: str  # Убедитесь, что это str
+
+    class Config:
+        from_attributes = True  # Для поддержки ORM
 
 # Схема для вывода задачи
 class TaskOut(BaseModel):

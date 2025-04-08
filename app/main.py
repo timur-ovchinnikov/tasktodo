@@ -21,6 +21,11 @@ def read_root():
 @app.post("/register")
 async def register_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
+        # Check if the email already exists
+        existing_user = crud.get_user_by_email(db, email=user.email)
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
         db_user = crud.create_user(db, user)
         return {"msg": "User created", "user": db_user}
     except Exception as e:
@@ -46,7 +51,10 @@ def read_users_me(current_user: User = Depends(jwt.get_current_user)):
 # Создание задачи
 @app.post("/api/v1/task/new", response_model=TaskOut)
 def create_task(task: TaskCreate, db: Session = Depends(get_db), current_user: User = Depends(jwt.get_current_user)):
-    return crud.create_task(db=db, task=task, user_id=current_user.id)
+    try:
+        return crud.create_task(db=db, task=task, user_id=current_user.id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 # Получение всех задач для текущего пользователя
 @app.get("/api/v1/task", response_model=list[schemas.TaskListItem])

@@ -12,6 +12,6 @@ class Task(Base):
     description = Column(Text, nullable=True)
     due_date = Column(DateTime, nullable=False)
     completed = Column(Boolean, default=False)
-    executor_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    executor_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
 
     executor = relationship("User", back_populates="tasks")

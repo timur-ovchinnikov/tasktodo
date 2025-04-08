@@ -4,6 +4,7 @@ from uuid import UUID
 from app.security import get_password_hash, verify_password
 from pydantic import BaseModel
 import uuid
+from sqlalchemy.exc import SQLAlchemyError
 
 # Создание нового пользователя
 def create_user(db: Session, user: schemas.UserCreate):
@@ -15,26 +16,35 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 # Создание новой задачи
-def create_task(db: Session, task: schemas.TaskCreate, user_id: str):
-    db_task = models.Task(
-        id=str(uuid.uuid4()),  # Генерация уникального идентификатора
-        title=task.title,
-        description=task.description,
-        due_date=task.due_date,
-        completed=task.completed,
-        executor_id=user_id,  # Привязка задачи к пользователю
-    )
-    db.add(db_task)
-    db.commit()
-    db.refresh(db_task)
-    return db_task
+def create_task(db: Session, task: schemas.TaskCreate, user_id: uuid.UUID):
+    try:
+        db_task = models.Task(
+            id=str(uuid.uuid4()),  # Генерация уникального идентификатора
+            title=task.title,
+            description=task.description,
+            due_date=task.due_date,
+            completed=task.completed,
+            executor_id=user_id,  # Привязка задачи к пользователю
+        )
+        db.add(db_task)
+        db.commit()
+        db.refresh(db_task)
+        return db_task
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise Exception(f"Database error: {str(e)}")
 
 # Получение задачи по ID
-def get_task(db: Session, task_id: UUID, user_id: UUID):
-    return db.query(models.Task).filter(models.Task.id == task_id, models.Task.executor_id == user_id).first()
+def get_task(db: Session, task_id: str, user_id: uuid.UUID):
+    try:
+        # Преобразуем task_id в UUID
+        task_uuid = uuid.UUID(task_id)
+        return db.query(models.Task).filter(models.Task.id == task_uuid, models.Task.executor_id == user_id).first()
+    except ValueError:
+        return None
 
 # Получение списка задач
-def get_tasks(db: Session, user_id: UUID, skip: int = 0, limit: int = 10):
+def get_tasks(db: Session, user_id: uuid.UUID, skip: int = 0, limit: int = 10):
     return db.query(models.Task).filter(models.Task.executor_id == user_id).offset(skip).limit(limit).all()
 
 # Получение пользователя по email
@@ -62,13 +72,17 @@ def update_task(db: Session, task_id: UUID, task_update: schemas.TaskUpdate, use
     return task
 
 # Функция удаления задачи
-def delete_task(db: Session, task_id: UUID, user_id: UUID):
-    task = get_task(db, task_id, user_id)
-    if not task:
+def delete_task(db: Session, task_id: str, user_id: uuid.UUID):
+    try:
+        # Преобразуем task_id в UUID
+        task_uuid = uuid.UUID(task_id)
+        task = db.query(models.Task).filter(models.Task.id == task_uuid, models.Task.executor_id == user_id).first()
+        if task:
+            db.delete(task)
+            db.commit()
+        return task
+    except ValueError:
         return None
-    db.delete(task)
-    db.commit()
-    return {"msg": "Task successfully deleted"}
 
 class UserCreate(BaseModel):
     # ...existing fields...
