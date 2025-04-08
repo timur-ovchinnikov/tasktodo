@@ -1,5 +1,7 @@
+version: '3.8'
+
 services:
-  db:
+  postgres:
     image: postgres:15
     container_name: todo_postgres
     restart: always
@@ -23,10 +25,10 @@ services:
     build: .
     container_name: todo_app
     depends_on:
-      - db
+      - postgres
       - redis
     environment:
-      DATABASE_URL: postgresql://todo_user:todo_password@db/todo_db
+      DATABASE_URL: postgresql://todo_user:todo_password@postgres/todo_db
       REDIS_URL: redis://todo_redis:6379/0
       PYTHONPATH: /app
     ports:

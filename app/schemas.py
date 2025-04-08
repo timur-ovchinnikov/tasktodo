@@ -7,10 +7,13 @@ class TaskCreate(BaseModel):
     title: str
     description: str
     due_date: datetime
-    completed: bool = False
+    completed: bool = False  # Убедитесь, что поле completed указано
 
     class Config:
         orm_mode = True
+
+class TaskResponse(TaskCreate):
+    id: str
 
 # Схема для вывода задачи
 class TaskOut(BaseModel):

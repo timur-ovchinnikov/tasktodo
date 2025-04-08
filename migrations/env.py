@@ -5,10 +5,16 @@ from sqlalchemy import pool
 from app.models import user, task  # Импортируем модели для работы с метаданными
 from app.database import Base  # Базовый класс для метаданных
 from alembic import context
+import os
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+# Используем DATABASE_URL из переменных окружения
+database_url = os.getenv("DATABASE_URL")
+if database_url:
+    config.set_main_option("sqlalchemy.url", database_url)
 
 # Интерпретируем конфигурационный файл для Python логирования.
 if config.config_file_name is not None:

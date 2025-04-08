@@ -5,7 +5,7 @@ from app import schemas, crud, jwt
 from app.security import verify_password
 from app.schemas import UserCreate, TaskCreate, UserOut, TaskOut, TaskUpdate
 from app.database import get_db
-from app.routers import task, auth
+from app.routers import task, auth, tasks  # Импортируем маршруты задач
 from app.schemas import User  # Добавляем импорт User
 
 app = FastAPI()
@@ -68,3 +68,6 @@ def delete_task(task_id: UUID, db: Session = Depends(get_db), current_user: User
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     return task
+
+# Регистрируем маршруты задач
+app.include_router(tasks.router, prefix="/api/v1/tasks", tags=["tasks"])

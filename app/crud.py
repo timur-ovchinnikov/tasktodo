@@ -3,6 +3,7 @@ from app import models, schemas
 from uuid import UUID
 from app.security import get_password_hash, verify_password
 from pydantic import BaseModel
+import uuid
 
 # Создание нового пользователя
 def create_user(db: Session, user: schemas.UserCreate):
@@ -14,8 +15,15 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 # Создание новой задачи
-def create_task(db: Session, task: schemas.TaskCreate, user_id: UUID):
-    db_task = models.Task(**task.dict(), executor_id=user_id)
+def create_task(db: Session, task: schemas.TaskCreate, user_id: str):
+    db_task = models.Task(
+        id=str(uuid.uuid4()),  # Генерация уникального идентификатора
+        title=task.title,
+        description=task.description,
+        due_date=task.due_date,
+        completed=task.completed,
+        executor_id=user_id,  # Привязка задачи к пользователю
+    )
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
