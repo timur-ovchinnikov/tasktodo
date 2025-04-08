@@ -19,7 +19,7 @@ def create_user(db: Session, user: schemas.UserCreate):
 def create_task(db: Session, task: schemas.TaskCreate, user_id: uuid.UUID):
     try:
         db_task = models.Task(
-            id=str(uuid.uuid4()),  # Генерация уникального идентификатора
+            id=uuid.uuid4(),  # Убедитесь, что UUID передаётся корректно
             title=task.title,
             description=task.description,
             due_date=task.due_date,
