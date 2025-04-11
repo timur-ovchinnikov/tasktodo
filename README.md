@@ -57,26 +57,6 @@
    docker exec -it todo_app alembic upgrade head
    ```
 
-## Выполнение миграций
-
-Если вы используете Docker, выполните миграции внутри контейнера приложения:
-
-```bash
-docker exec -it todo_app alembic upgrade head
-```
-
-Это создаст необходимые таблицы в базе данных.
-
-## Debugging Internal Server Errors
-
-1. Check the FastAPI server logs for detailed error messages.
-2. Verify the database connection and ensure migrations are applied:
-   ```bash
-   docker exec -it todo_app alembic upgrade head
-   ```
-3. Ensure the request payload matches the expected schema in `TaskCreate`.
-4. Inspect the `create_task` function in `crud.py` for potential issues.
-
 ## Использование API через curl
 
 ### Регистрация пользователя
