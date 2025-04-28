@@ -15,11 +15,13 @@ services:
       - "5432:5432"
 
   redis:
-    image: redis:latest
+    image: redis:7
     container_name: todo_redis
     restart: always
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
 
   app:
     build: .
@@ -28,13 +30,15 @@ services:
       - postgres
       - redis
     environment:
-      DATABASE_URL: postgresql://todo_user:todo_password@postgres/todo_db
-      REDIS_URL: redis://todo_redis:6379/0
+      DATABASE_URL: postgresql://todo_user:todo_password@postgres:5432/todo_db
+      REDIS_URL: redis://redis:6379/0
       PYTHONPATH: /app
     ports:
       - "8000:8000"
     volumes:
       - .:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
   postgres_data:
+  redis_data:

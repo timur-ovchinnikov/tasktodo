@@ -1,16 +1,25 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from uuid import UUID
 from datetime import datetime
+from typing import Optional, List
+from enum import Enum
 
 # Схема для создания задачи
-class TaskCreate(BaseModel):
-    title: str
-    description: str
-    due_date: datetime
-    completed: bool = False  # Убедитесь, что поле completed указано
+class TaskStatus(str, Enum):
+    TODO = "todo"
+    IN_PROGRESS = "in_progress"
+    DONE = "done"
 
-    class Config:
-        orm_mode = True
+class TaskBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    due_date: Optional[datetime] = None
+    status: TaskStatus = TaskStatus.TODO
+    priority: Optional[int] = None
+    tags: Optional[List[str]] = None
+
+class TaskCreate(TaskBase):
+    pass
 
 class TaskResponse(BaseModel):
     id: str  # Убедитесь, что это str
@@ -44,12 +53,18 @@ class UserOut(BaseModel):
         orm_mode = True
 
 # Схема для создания пользователя
-class UserCreate(BaseModel):
-    email: str
+class UserBase(BaseModel):
+    email: EmailStr
+
+class UserCreate(UserBase):
     password: str
 
+class User(UserBase):
+    id: int
+    is_active: bool
+
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Схема для пользователя (используется в зависимостях)
 class User(BaseModel):
@@ -71,11 +86,13 @@ class TaskListItem(BaseModel):
     class Config:
         orm_mode = True
 
-class TaskUpdate(BaseModel):
-    title: str | None = None
-    description: str | None = None
-    due_date: datetime | None = None
-    completed: bool | None = None
+class TaskUpdate(TaskBase):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    due_date: Optional[datetime] = None
+    status: Optional[TaskStatus] = None
+    priority: Optional[int] = None
+    tags: Optional[List[str]] = None
 
     class Config:
         orm_mode = True
@@ -87,3 +104,18 @@ class UserLogin(BaseModel):
 
     class Config:
         orm_mode = True
+
+class PaginationParams(BaseModel):
+    page: int = 1
+    per_page: int = 10
+
+class SortParams(BaseModel):
+    sort_by: str = "created_at"
+    sort_order: str = "desc"
+
+class TaskFilterParams(BaseModel):
+    status: Optional[TaskStatus] = None
+    priority: Optional[int] = None
+    tags: Optional[List[str]] = None
+    due_date_from: Optional[datetime] = None
+    due_date_to: Optional[datetime] = None

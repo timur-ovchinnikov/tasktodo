@@ -7,15 +7,51 @@ from app.schemas import UserCreate, TaskCreate, UserOut, TaskOut, TaskUpdate
 from app.database import get_db
 from app.routers import task, auth, tasks  # Импортируем маршруты задач
 from app.schemas import User  # Добавляем импорт User
+from fastapi.middleware.cors import CORSMiddleware
+import asyncio
+from contextlib import asynccontextmanager
+from .database import engine, Base
+from .core.logging import logger
+from .core.tasks import check_due_tasks
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("Starting up application...")
+    Base.metadata.create_all(bind=engine)
+    
+    # Start background tasks
+    db = next(get_db())
+    asyncio.create_task(check_due_tasks(db))
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down application...")
+    db.close()
+
+app = FastAPI(
+    title="TaskTodo API",
+    description="A simple task management API",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(task.router, prefix="/api/v1/tasks", tags=["tasks"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 
 @app.get("/")
-def read_root():
-    return {"message": "ToDo API is running!"}
+async def root():
+    return {"message": "Welcome to TaskTodo API"}
 
 # Регистрация пользователя
 @app.post("/register")

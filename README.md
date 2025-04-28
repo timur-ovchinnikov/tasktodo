@@ -1,5 +1,85 @@
-# tasktodo
-Тестовое задание ToDo
+# TaskTodo
+
+A modern task management API built with FastAPI, PostgreSQL, and Redis.
+
+## Features
+
+- User authentication with JWT tokens
+- Task management (create, read, update, delete)
+- Task filtering and sorting
+- Pagination support
+- Email notifications for upcoming tasks
+- Redis caching for improved performance
+- Comprehensive logging
+- CI/CD pipeline with GitHub Actions
+- Docker support for easy deployment
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.11+
+- Docker and Docker Compose
+- Redis
+- PostgreSQL
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/tasktodo.git
+cd tasktodo
+```
+
+2. Create a `.env` file with the following variables:
+```env
+DATABASE_URL=postgresql://todo_user:todo_password@postgres:5432/todo_db
+REDIS_URL=redis://redis:6379/0
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+```
+
+3. Start the services:
+```bash
+docker-compose up --build
+```
+
+4. Run database migrations:
+```bash
+docker exec -it tasktodo_app alembic upgrade head
+```
+
+## API Documentation
+
+Once the application is running, you can access the API documentation at:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+## Testing
+
+Run the tests with:
+```bash
+pytest
+```
+
+For coverage report:
+```bash
+pytest --cov=app
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Отладка
 
